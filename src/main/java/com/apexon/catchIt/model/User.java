@@ -19,8 +19,6 @@ public class User  {
 
     private String userName;
     private String email;
-
-
     private String password;
 
     private boolean isAccountExpired=true;
@@ -29,8 +27,6 @@ public class User  {
 
     @Enumerated(EnumType.STRING)
     private Roles role=Roles.ASPIRANT;
-
-
     public Long getId() {
         return id;
     }

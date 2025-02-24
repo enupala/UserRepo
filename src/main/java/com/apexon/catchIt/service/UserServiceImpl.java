@@ -1,14 +1,18 @@
 package com.apexon.catchIt.service;
 
-import com.apexon.catchIt.dto.UserDto;
+import com.apexon.catchIt.dto.*;
 import com.apexon.catchIt.mapper.UserMapper;
+import com.apexon.catchIt.model.Roles;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl {
@@ -20,52 +24,113 @@ public class UserServiceImpl {
     @Autowired
     UserMapper userMapper;
 
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-    public User registerUser(User user)
-    {
-        if(userRepo.existsByEmail(user.getEmail()))
+    public UserDto registerUser(UserRegisterDto user) {
+        if (userRepo.existsByEmail(user.getEmail()))
             throw new RuntimeException("Email already exists");
-        System.out.println("User pass bfr encoding is "+user.getPassword());
-        String encodedPassword=passwordEncoder.encode(user.getPassword());
+        System.out.println("User pass bfr encoding is " + user.getPassword());
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        System.out.println("User pass after encdeing is "+user.getPassword());
-        return userRepo.save(user);
+        System.out.println("User pass after encdeing is " + user.getPassword());
+        User u=new User();
+        u.setPassword(user.getPassword());
+        u.setUserName(user.getUserName());
+        u.setEmail(user.getEmail());
+        u.setRole(user.getRole());
+
+
+        return userMapper.convertUserToUserDto(userRepo.save(u));
+
     }
-    public UserDto updateUser(User user, Long id)
-    {
-        if(userRepo.existsByEmailAndIdNot(user.getEmail(),id))
-        {
+
+    public UserDto updateUser(UpdateUserDto user, Long id) {
+        if (userRepo.existsByEmailAndIdNot(user.getEmail(), id)) {
             throw new RuntimeException("Email already exists");
         }
-        Optional<User> optionalUser=userRepo.findById(id);
-        if(!optionalUser.isPresent())
-        {
-            throw new RuntimeException("user not found with "+id);
+        Optional<User> optionalUser = userRepo.findById(id);
+        if (!optionalUser.isPresent()) {
+            throw new RuntimeException("user not found with " + id);
         }
-        User exisitngUser= optionalUser.get();
+        User exisitngUser = optionalUser.get();
+        if(user.getUserName()!=null)
+        {
         exisitngUser.setUserName(user.getUserName());
+        }
+        if(user.getEmail()!=null)
         exisitngUser.setEmail(user.getEmail());
+
 
         /*exisitngUser.setPassword(user.getPassword());
         exisitngUser.setRoles(user.getRoles());*/
-       // userRepo.save(exisitngUser);
-      return (userMapper.convertUserToUserDto(userRepo.save(exisitngUser)));
+        // userRepo.save(exisitngUser);
+        return (userMapper.convertUserToUserDto(userRepo.save(exisitngUser)));
 
 
     }
-    public UserDto getUserById(Long id)
-    {
+
+    public UserAdminDto getUserById(Long id) {
+        Optional<User> user = userRepo.findById(id);
+        if (!user.isPresent()) {
+            throw new RuntimeException("User not found with " + id);
+        }
+        User exisitngUser = user.get();
+
+        return userMapper.convertUserToUserAdminDto(exisitngUser);
+
+    }
+
+    public boolean updateUserPassword(Long id, UpdatePasswordDto updatePasswordDto) {
+        Optional<User>user=userRepo.findById(id);
+        if(!user.isPresent()){
+            throw new RuntimeException("User not found with "+ id);
+        }
+        User existingUser=user.get();
+        if(bCryptPasswordEncoder.matches(updatePasswordDto.getPassword(),existingUser.getPassword()))
+        {
+            throw new RuntimeException("New password should not be same as old password,Try with different password");
+        }
+        existingUser.setPassword(bCryptPasswordEncoder.encode(updatePasswordDto.getPassword()));
+        userRepo.save(existingUser);
+        return true;
+
+    }
+
+    public List<UserAdminDto> fetchAllUsersByAdminId(Long id) {
         Optional<User> user=userRepo.findById(id);
         if(!user.isPresent())
         {
-            throw new RuntimeException("User not found with "+ id);
+            throw new RuntimeException("User not found with "+id);
         }
-        User exisitngUser=user.get();
-
-        return userMapper.convertUserToUserDto(exisitngUser);
-
+       if(user.get().getRole()!=Roles.ADMIN)
+       {
+           throw new RuntimeException("you dont have enough permissions to access");
+       }
+       return userRepo.findAll().stream().filter(u->u.getRole()!= Roles.ADMIN).map(userMapper::convertUserToUserAdminDto)
+               .collect(Collectors.toList());
     }
 
+    public UserAdminDto updateUserAccountDetails(Long adminId, ManageUserAccountDto manageUserAccountDto) {
+        Optional<User> adminUser=userRepo.findById(adminId);
+        if(!adminUser.isPresent())
+        {
+            throw new RuntimeException("User not found with "+adminId);
+        }
+        if(adminUser.get().getRole()!=Roles.ADMIN)
+        {
+            throw new RuntimeException("you dont have enough permissions to access");
+        }
+        Optional<User> normalUser=userRepo.findById(manageUserAccountDto.getId());
+        if(!normalUser.isPresent())
+        {
+            throw new RuntimeException("User not found with "+normalUser);
+        }
+        User actualUser=normalUser.get();
+        actualUser.setAccountExpired(manageUserAccountDto.isAccountExpired());
+        actualUser.setAccountLocked(manageUserAccountDto.isAccountLocked());
+        actualUser.setCredentialsExpired(manageUserAccountDto.isCredentialsExpired());
+        return userMapper.convertUserToUserAdminDto(userRepo.save(actualUser));
 
+    }
 }

@@ -2,20 +2,20 @@ package com.apexon.catchIt.dto;
 
 import com.apexon.catchIt.model.Roles;
 
-public class UserDto {
+public class UserAdminDto {
     private Long id;
 
-    public UserDto(Long id, String userName, String email, Roles role) {
+    public UserAdminDto(Long id, String userName, String email, Roles role, boolean isAccountExpired, boolean isAccountLocked, boolean isCredentialsExpired) {
         this.id = id;
         this.userName = userName;
         this.email = email;
         this.role = role;
-        /*this.isAccountExpired = isAccountExpired;
+        this.isAccountExpired = isAccountExpired;
         this.isAccountLocked = isAccountLocked;
-        this.isCredentialsExpired = isCredentialsExpired;*/
+        this.isCredentialsExpired = isCredentialsExpired;
     }
 
-    public UserDto() {
+    public UserAdminDto() {
     }
 
     public String getUserName() {
@@ -45,7 +45,7 @@ public class UserDto {
     public Roles getRole() {
         return role;
     }
-/*
+
     public boolean isAccountExpired() {
         return isAccountExpired;
     }
@@ -68,7 +68,7 @@ public class UserDto {
 
     public void setCredentialsExpired(boolean credentialsExpired) {
         isCredentialsExpired = credentialsExpired;
-    }*/
+    }
 
     public void setRole(Roles role) {
         this.role = role;
@@ -77,7 +77,7 @@ public class UserDto {
     private String userName;
     private String email;
     private Roles role;
-   /* private boolean isAccountExpired;
+    private boolean isAccountExpired;
     private boolean isAccountLocked;
-    private boolean  isCredentialsExpired;*/
+    private boolean  isCredentialsExpired;
 }

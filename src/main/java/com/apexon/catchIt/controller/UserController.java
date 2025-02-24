@@ -1,11 +1,15 @@
 package com.apexon.catchIt.controller;
 
-import com.apexon.catchIt.dto.UserDto;
+import com.apexon.catchIt.dto.*;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.UserRepo;
 import com.apexon.catchIt.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -17,7 +21,7 @@ public class UserController {
     UserRepo userRepo;
 
     @PostMapping("/registerUser")
-    public User registerUser(@RequestBody User user)
+    public UserDto registerUser(@RequestBody UserRegisterDto user)
     {
         return userServiceImpl.registerUser(user);
     }
@@ -28,16 +32,30 @@ public class UserController {
         return userRepo.findByUserName(uname);
     }
     @GetMapping("/getUserById/{id}")
-    public UserDto getUserById(@PathVariable Long id)
+    public UserAdminDto getUserById(@PathVariable Long id)
     {
-        UserDto userDto=userServiceImpl.getUserById(id);
+        UserAdminDto userDto=userServiceImpl.getUserById(id);
         return userDto;
     }
     @PutMapping("/updateUser/{id}")
-    public UserDto updateUserById(@RequestBody User user, @PathVariable Long id)
+    public UserDto updateUserById(@RequestBody UpdateUserDto user, @PathVariable Long id)
     {
         UserDto userDto=userServiceImpl.updateUser(user,id);
         return userDto;
 
+    }
+    @PutMapping("/updatePassword/{id}")
+    public ResponseEntity<String> updateUserPassword(@RequestBody UpdatePasswordDto updatePasswordDto, @PathVariable Long id){
+        userServiceImpl.updateUserPassword(id,updatePasswordDto);
+       return new ResponseEntity<>("Password updated Successfully", HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllUsers/{adminId}")
+    public List<UserAdminDto> fetchAllUsersByAdminId(@PathVariable Long adminId){
+        return userServiceImpl.fetchAllUsersByAdminId(adminId);
+    }
+    @PutMapping("/updateUserAccountDetails/{adminId}")
+    public UserAdminDto updateUserAccountDetails(@PathVariable Long adminId,@RequestBody ManageUserAccountDto manageUserAccountDto){
+        return userServiceImpl.updateUserAccountDetails(adminId,manageUserAccountDto);
     }
 }
