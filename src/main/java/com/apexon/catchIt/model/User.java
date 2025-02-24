@@ -2,18 +2,25 @@ package com.apexon.catchIt.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
 
 @Entity
 @Table(name = "users")
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String userName;
     private String email;
-    @JsonIgnore
-    @Column(nullable = false)
+
+
     private String password;
 
     private boolean isAccountExpired=true;

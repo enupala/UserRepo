@@ -1,5 +1,7 @@
 package com.apexon.catchIt.service;
 
+import com.apexon.catchIt.dto.UserDto;
+import com.apexon.catchIt.mapper.UserMapper;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ public class UserServiceImpl {
     UserRepo userRepo;
     @Autowired
     PasswordEncoder passwordEncoder;
+    @Autowired
+    UserMapper userMapper;
 
 
 
@@ -22,12 +26,13 @@ public class UserServiceImpl {
     {
         if(userRepo.existsByEmail(user.getEmail()))
             throw new RuntimeException("Email already exists");
+        System.out.println("User pass bfr encoding is "+user.getPassword());
         String encodedPassword=passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
-        System.out.println("User pass is "+user.getPassword());
+        System.out.println("User pass after encdeing is "+user.getPassword());
         return userRepo.save(user);
     }
-    public User updateUser(User user,Long id)
+    public UserDto updateUser(User user, Long id)
     {
         if(userRepo.existsByEmailAndIdNot(user.getEmail(),id))
         {
@@ -44,8 +49,23 @@ public class UserServiceImpl {
 
         /*exisitngUser.setPassword(user.getPassword());
         exisitngUser.setRoles(user.getRoles());*/
+       // userRepo.save(exisitngUser);
+      return (userMapper.convertUserToUserDto(userRepo.save(exisitngUser)));
 
-       return userRepo.save(exisitngUser);
 
     }
+    public UserDto getUserById(Long id)
+    {
+        Optional<User> user=userRepo.findById(id);
+        if(!user.isPresent())
+        {
+            throw new RuntimeException("User not found with "+ id);
+        }
+        User exisitngUser=user.get();
+
+        return userMapper.convertUserToUserDto(exisitngUser);
+
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.apexon.catchIt.controller;
 
+import com.apexon.catchIt.dto.UserDto;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.UserRepo;
 import com.apexon.catchIt.service.UserServiceImpl;
@@ -27,13 +28,16 @@ public class UserController {
         return userRepo.findByUserName(uname);
     }
     @GetMapping("/getUserById/{id}")
-    public Optional<User> getUserById(@PathVariable Long id)
+    public UserDto getUserById(@PathVariable Long id)
     {
-        return userRepo.findById(id);
+        UserDto userDto=userServiceImpl.getUserById(id);
+        return userDto;
     }
     @PutMapping("/updateUser/{id}")
-    public User updateUserById(@RequestBody User user,@PathVariable Long id)
+    public UserDto updateUserById(@RequestBody User user, @PathVariable Long id)
     {
-       return userServiceImpl.updateUser(user,id);
+        UserDto userDto=userServiceImpl.updateUser(user,id);
+        return userDto;
+
     }
 }
