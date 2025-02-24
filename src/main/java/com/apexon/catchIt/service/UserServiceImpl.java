@@ -3,6 +3,7 @@ package com.apexon.catchIt.service;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -12,12 +13,18 @@ public class UserServiceImpl {
 
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+
 
     public User registerUser(User user)
     {
         if(userRepo.existsByEmail(user.getEmail()))
             throw new RuntimeException("Email already exists");
-
+        String encodedPassword=passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        System.out.println("User pass is "+user.getPassword());
         return userRepo.save(user);
     }
     public User updateUser(User user,Long id)
@@ -34,6 +41,7 @@ public class UserServiceImpl {
         User exisitngUser= optionalUser.get();
         exisitngUser.setUserName(user.getUserName());
         exisitngUser.setEmail(user.getEmail());
+
         /*exisitngUser.setPassword(user.getPassword());
         exisitngUser.setRoles(user.getRoles());*/
 
