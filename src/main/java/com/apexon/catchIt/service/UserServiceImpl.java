@@ -167,4 +167,18 @@ public class UserServiceImpl {
 
         return true;
     }
+
+    public UserAdminDto getUserByName(String uname) {
+
+
+            Optional<User> user = userRepo.findByUserName(uname);
+            if (!user.isPresent()) {
+                throw new RuntimeException("User not found with " + uname);
+            }
+            User exisitngUser = user.get();
+
+            return userMapper.convertUserToUserAdminDto(exisitngUser);
+
+
+    }
 }

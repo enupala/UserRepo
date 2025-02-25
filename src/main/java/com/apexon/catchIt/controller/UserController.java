@@ -26,9 +26,10 @@ public class UserController {
     }
 
     @GetMapping("/getUserByName/{uname}")
-    public Optional<User> getUser(@PathVariable String uname)
+    public UserAdminDto getUser(@PathVariable String uname)
     {
-        return userRepo.findByUserName(uname);
+        UserAdminDto userAdminDto=userServiceImpl.getUserByName(uname);
+        return userAdminDto;
     }
     @GetMapping("/getUserById/{id}")
     public UserAdminDto getUserById(@PathVariable Long id)
