@@ -140,7 +140,7 @@ public class UserServiceImpl {
 
     }
 
-    public boolean assignRolesToUser(Long userId, Set<Role> roleTypes, Long id) {
+    public boolean assignRolesToUser(Long userId, Set<Roles> roleTypes, Long id) {
         // Check if the user exists
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
@@ -149,7 +149,7 @@ public class UserServiceImpl {
         Optional<User> isAdmin=userRepo.findById(id);
         if(isAdmin.isEmpty())
         {
-            throw new RuntimeException("User nt found with "+id);
+            throw new RuntimeException("User not found with "+id);
         }
         User adminUser=isAdmin.get();
         if (!adminUser.getRole().equals(Roles.ADMIN)) {
@@ -160,7 +160,7 @@ public class UserServiceImpl {
         Set<Role> newRoles = rolesRepo.findByRoleNameIn(roleTypes);
 
         // Replace existing roles with new ones
-        user.setRole(Roles.ADMIN);
+        user.setRoles(newRoles);
 
         // Save the updated user
         userRepo.save(user);

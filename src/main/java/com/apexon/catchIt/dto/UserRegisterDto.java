@@ -7,7 +7,7 @@ public class UserRegisterDto {
     private String userName;
     private String email;
     private String password;
-    private Roles role;
+    private Roles role=Roles.ASPIRANT;
 
     public Roles getRole() {
         return role;
