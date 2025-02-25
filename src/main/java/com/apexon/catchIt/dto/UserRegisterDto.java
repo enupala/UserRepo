@@ -1,6 +1,6 @@
 package com.apexon.catchIt.dto;
 
-import com.apexon.catchIt.model.Role;
+
 import com.apexon.catchIt.model.Roles;
 
 public class UserRegisterDto {

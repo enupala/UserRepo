@@ -2,8 +2,6 @@ package com.apexon.catchIt.model;
 
 import jakarta.persistence.*;
 
-import java.util.Collections;
-
 @Entity
 public class Role {
     public Role(Roles roleName) {
