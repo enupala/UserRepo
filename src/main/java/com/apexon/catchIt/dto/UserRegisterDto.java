@@ -1,21 +1,21 @@
 package com.apexon.catchIt.dto;
 
+import com.apexon.catchIt.model.Role;
 import com.apexon.catchIt.model.Roles;
 
 public class UserRegisterDto {
     private String userName;
+    private String email;
+    private String password;
+    private Role role;
 
-    public Roles getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(Roles role) {
+    public void setRole(Role role) {
         this.role = role;
     }
-
-    private String email;
-    private String password;
-    private Roles role;
 
     public UserRegisterDto() {
     }
@@ -44,7 +44,7 @@ public class UserRegisterDto {
         this.password = password;
     }
 
-    public UserRegisterDto(String userName, String email, String password,Roles role) {
+    public UserRegisterDto(String userName, String email, String password,Role role) {
         this.userName = userName;
         this.role=role;
         this.email = email;

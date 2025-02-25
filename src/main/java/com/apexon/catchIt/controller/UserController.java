@@ -7,8 +7,8 @@ import com.apexon.catchIt.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -57,5 +57,14 @@ public class UserController {
     @PutMapping("/updateUserAccountDetails/{adminId}")
     public UserAdminDto updateUserAccountDetails(@PathVariable Long adminId,@RequestBody ManageUserAccountDto manageUserAccountDto){
         return userServiceImpl.updateUserAccountDetails(adminId,manageUserAccountDto);
+    }
+    @PutMapping("/assignRoles/{id}")
+    public ResponseEntity<String> assignRoles(@RequestBody AssignRolesDto assignRolesDto, @PathVariable Long id) {
+        try {
+            userServiceImpl.assignRolesToUser(assignRolesDto.getUserId(), assignRolesDto.getRoles(), id);
+            return ResponseEntity.ok("Roles updated successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
     }
 }

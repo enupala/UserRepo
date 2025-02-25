@@ -2,8 +2,10 @@ package com.apexon.catchIt.service;
 
 import com.apexon.catchIt.dto.*;
 import com.apexon.catchIt.mapper.UserMapper;
+import com.apexon.catchIt.model.Role;
 import com.apexon.catchIt.model.Roles;
 import com.apexon.catchIt.model.User;
+import com.apexon.catchIt.repositroy.RolesRepo;
 import com.apexon.catchIt.repositroy.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +29,8 @@ public class UserServiceImpl {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    RolesRepo rolesRepo;
 
     public UserDto registerUser(UserRegisterDto user) {
         if (userRepo.existsByEmail(user.getEmail()))
@@ -107,8 +112,10 @@ public class UserServiceImpl {
        {
            throw new RuntimeException("you dont have enough permissions to access");
        }
-       return userRepo.findAll().stream().filter(u->u.getRole()!= Roles.ADMIN).map(userMapper::convertUserToUserAdminDto)
-               .collect(Collectors.toList());
+       /*return userRepo.findAll().stream().filter(u->u.getRole()!= Roles.ADMIN).map(userMapper::convertUserToUserAdminDto)
+               .collect(Collectors.toList());*/
+        return userRepo.findAll().stream().map(userMapper::convertUserToUserAdminDto)
+                .collect(Collectors.toList());
     }
 
     public UserAdminDto updateUserAccountDetails(Long adminId, ManageUserAccountDto manageUserAccountDto) {
@@ -132,5 +139,34 @@ public class UserServiceImpl {
         actualUser.setCredentialsExpired(manageUserAccountDto.isCredentialsExpired());
         return userMapper.convertUserToUserAdminDto(userRepo.save(actualUser));
 
+    }
+
+    public boolean assignRolesToUser(Long userId, Set<Role> roleTypes, Long id) {
+        // Check if the user exists
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Check if the admin has permission (only ADMIN can assign roles)
+        Optional<User> isAdmin=userRepo.findById(id);
+        if(isAdmin.isEmpty())
+        {
+            throw new RuntimeException("User nt found with "+id);
+        }
+        User adminUser=isAdmin.get();
+        Set<Role> roles = adminUser.getRoles();
+        if (!roles.contains("ADMIN")){
+            throw new RuntimeException("Access Denied: Only Admins can assign roles.");
+        }
+
+        // Fetch roles from database
+        Set<Role> newRoles = rolesRepo.findByRoleNameIn(roleTypes);
+
+        // Replace existing roles with new ones
+        user.setRoles(newRoles);
+
+        // Save the updated user
+        userRepo.save(user);
+
+        return true;
     }
 }
