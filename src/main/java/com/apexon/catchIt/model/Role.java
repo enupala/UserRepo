@@ -2,6 +2,8 @@ package com.apexon.catchIt.model;
 
 import jakarta.persistence.*;
 
+import java.util.Collections;
+
 @Entity
 public class Role {
     public Role(Roles roleName) {
@@ -18,6 +20,7 @@ public class Role {
 
     public void setId(Long id) {
         this.id = id;
+
     }
 
     public Roles getRoleName() {
@@ -30,5 +33,5 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false)
-    private Roles roleName=Roles.ASPIRANT;
+    private Roles roleName;
 }

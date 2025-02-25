@@ -1,13 +1,15 @@
 package com.apexon.catchIt.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 
 @Entity
 @Table(name = "users")
-
 
 public class User  {
     @Id
@@ -18,25 +20,18 @@ public class User  {
     private String email;
     private String password;
 
+    public Roles getRole() {
+        return role;
+    }
+
+    public void setRole(Roles role) {
+        this.role = role;
+    }
+
     private boolean isAccountExpired=true;
     private boolean isAccountLocked=true;
     private boolean  isCredentialsExpired=true;
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-   @ElementCollection(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
     @Enumerated(EnumType.STRING)
     private Roles role=Roles.ASPIRANT;
     public Long getId() {
@@ -96,15 +91,4 @@ public class User  {
     }
 
 
-    public Roles getRole() {
-        return role;
-    }
-
-    public void setRole(Roles role) {
-        this.role = role;
-    }
-}
-    public User() {
-        this.roles.add(new Role(Roles.ASPIRANT)); // Default role assigned
-    }
 }

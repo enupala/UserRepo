@@ -153,8 +153,7 @@ public class UserServiceImpl {
             throw new RuntimeException("User nt found with "+id);
         }
         User adminUser=isAdmin.get();
-        Set<Role> roles = adminUser.getRoles();
-        if (!roles.contains("ADMIN")){
+        if (!adminUser.getRole().equals(Roles.ADMIN)) {
             throw new RuntimeException("Access Denied: Only Admins can assign roles.");
         }
 
@@ -162,7 +161,7 @@ public class UserServiceImpl {
         Set<Role> newRoles = rolesRepo.findByRoleNameIn(roleTypes);
 
         // Replace existing roles with new ones
-        user.setRoles(newRoles);
+        user.setRole(Roles.ADMIN);
 
         // Save the updated user
         userRepo.save(user);
