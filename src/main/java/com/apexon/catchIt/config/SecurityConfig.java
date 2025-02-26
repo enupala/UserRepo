@@ -16,7 +16,7 @@ public class SecurityConfig {
         hs.csrf(csrf -> csrf.disable())
                 /*.cors(cors -> cors.configure(hs))//Enable Cors*/
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/registerUser","/getUserById/{id}","/updateUser/{id}","/updatePassword/{id}","/getAllUsers/{adminId}","/updateUserAccountDetails/{adminId}","/assignRoles/{id}","/getUserByName/{uname}","/create").permitAll()
+                        .requestMatchers("/registerUser","/getUserById/{id}","/updateUser/{id}","/updatePassword/{id}","/getAllUsers/{adminId}","/updateUserAccountDetails/{adminId}","/assignRoles/{id}","/getUserByName/{uname}","/create","/getAllUsers").permitAll()
                         /*.requestMatchers("/getAllUsers/{adminId}").hasRole("ADMIN")*/
                         /*.requestMatchers("/getUserById/{id}").hasAnyRole("INDIVIDUAL", "ADMIN")*/
                         .anyRequest().authenticated());

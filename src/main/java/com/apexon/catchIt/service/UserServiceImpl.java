@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -188,4 +190,14 @@ public class UserServiceImpl {
 
 
     }
+
+    public List<UserDto> fetchAllUsers() {
+        List<User> user = userRepo.findAll();
+        List<UserDto> userDtoList = new ArrayList<>();
+        for (User u : user)
+            userDtoList.add(userMapper.convertUserToUserDto(u));
+        System.out.println("fetch All users " + userDtoList.get(0));
+        return userDtoList;
+    }
+
 }

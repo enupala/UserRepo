@@ -59,6 +59,10 @@ public class UserController {
     public List<UserAdminDto> fetchAllUsersByAdminId(@PathVariable Long adminId){
         return userServiceImpl.fetchAllUsersByAdminId(adminId);
     }
+    @GetMapping("/getAllUsers")
+    public List<UserDto> fetchAllUsers(){
+        return userServiceImpl.fetchAllUsers();
+    }
     @PutMapping("/updateUserAccountDetails/{adminId}")
     public UserAdminDto updateUserAccountDetails(@PathVariable Long adminId,@RequestBody ManageUserAccountDto manageUserAccountDto){
         return userServiceImpl.updateUserAccountDetails(adminId,manageUserAccountDto);
