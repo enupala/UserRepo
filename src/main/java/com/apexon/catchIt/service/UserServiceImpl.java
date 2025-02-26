@@ -7,6 +7,7 @@ import com.apexon.catchIt.model.Roles;
 import com.apexon.catchIt.model.User;
 import com.apexon.catchIt.repositroy.RolesRepo;
 import com.apexon.catchIt.repositroy.UserRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -140,7 +141,8 @@ public class UserServiceImpl {
 
     }
 
-    public boolean assignRolesToUser(Long userId, Set<Roles> roleTypes, Long id) {
+    @Transactional
+    public boolean assignRolesToUser(Long userId, Set<String> roleTypes, Long id) {
         // Check if the user exists
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
@@ -155,11 +157,16 @@ public class UserServiceImpl {
         if (!adminUser.getRole().equals(Roles.ADMIN)) {
             throw new RuntimeException("Access Denied: Only Admins can assign roles.");
         }
+        // Convert Set<String> to Set<Roles> (Enums)
+        Set<Roles> enumRoles = roleTypes.stream()
+                .map(role -> Roles.valueOf(role.toUpperCase())) // Convert String to Enum
+                .collect(Collectors.toSet());
 
         // Fetch roles from database
-        Set<Role> newRoles = rolesRepo.findByRoleNameIn(roleTypes);
+        Set<Role> newRoles = rolesRepo.findByRoleNameIn(enumRoles);
 
         // Replace existing roles with new ones
+        System.out.println("Fetched roles: " + newRoles);
         user.setRoles(newRoles);
 
         // Save the updated user

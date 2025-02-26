@@ -15,16 +15,16 @@ public class AssignRolesDto {
                 this.userId = userId;
         }
 
-        public Set<Roles> getRoles() {
+        public Set<String> getRoles() {
                 return roles;
         }
 
-        public void setRoles(Set<Roles> roles) {
+        public void setRoles(Set<String> roles) {
                 this.roles = roles;
         }
 
         private Long userId;
-        private Set<Roles> roles= new HashSet<>();
+        private Set<String> roles= new HashSet<>();
 
 
 

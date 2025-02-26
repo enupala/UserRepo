@@ -1,7 +1,9 @@
 package com.apexon.catchIt.controller;
 
 import com.apexon.catchIt.dto.*;
+import com.apexon.catchIt.model.Role;
 import com.apexon.catchIt.model.User;
+import com.apexon.catchIt.repositroy.RolesRepo;
 import com.apexon.catchIt.repositroy.UserRepo;
 import com.apexon.catchIt.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@CrossOrigin("*")
 @RestController
 public class UserController {
     @Autowired
@@ -18,6 +21,8 @@ public class UserController {
 
     @Autowired
     UserRepo userRepo;
+    @Autowired
+    RolesRepo rolesRepo;
 
     @PostMapping("/registerUser")
     public UserDto registerUser(@RequestBody UserRegisterDto user)
@@ -66,5 +71,16 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
         }
+    }
+    @PostMapping("/create")
+    public ResponseEntity<String> createRole(@RequestBody Role role) {
+        if (role.getRoleName() == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role name cannot be null.");
+        }
+        if (rolesRepo.findByRoleName(role.getRoleName()).isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Role already exists.");
+        }
+        rolesRepo.save(role);
+        return ResponseEntity.ok("Role created successfully.");
     }
 }
