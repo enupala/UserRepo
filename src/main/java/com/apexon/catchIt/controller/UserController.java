@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin("*")
+@RequestMapping("/api")
 @RestController
 public class UserController {
     @Autowired
@@ -70,7 +71,7 @@ public class UserController {
     @PutMapping("/assignRoles/{id}")
     public ResponseEntity<String> assignRoles(@RequestBody AssignRolesDto assignRolesDto, @PathVariable Long id) {
         try {
-            userServiceImpl.assignRolesToUser(assignRolesDto.getUserId(), assignRolesDto.getRoles(), id);
+            userServiceImpl.assignRolesToUser(assignRolesDto.getUserId(), assignRolesDto.getRole(), id);
             return ResponseEntity.ok("Roles updated successfully");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

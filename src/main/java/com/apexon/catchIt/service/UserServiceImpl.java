@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -144,7 +143,7 @@ public class UserServiceImpl {
     }
 
     @Transactional
-    public boolean assignRolesToUser(Long userId, Set<String> roleTypes, Long id) {
+    public boolean assignRolesToUser(Long userId, Roles roleTypes, Long id) {
         // Check if the user exists
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
@@ -159,20 +158,27 @@ public class UserServiceImpl {
         if (!adminUser.getRole().equals(Roles.ADMIN)) {
             throw new RuntimeException("Access Denied: Only Admins can assign roles.");
         }
-        // Convert Set<String> to Set<Roles> (Enums)
-        Set<Roles> enumRoles = roleTypes.stream()
-                .map(role -> Roles.valueOf(role.toUpperCase())) // Convert String to Enum
-                .collect(Collectors.toSet());
 
-        // Fetch roles from database
-        Set<Role> newRoles = rolesRepo.findByRoleNameIn(enumRoles);
 
-        // Replace existing roles with new ones
-        System.out.println("Fetched roles: " + newRoles);
-        user.setRoles(newRoles);
+
+       // user.setRoles(newRoles);
+       /* Role role=new Role();
+        role.setRoleName(Roles.ADMIN);
+        user.setRole(Roles.ADMIN);*/
+        user.setRole(roleTypes);
+
+        //rolesRepo.save(role);
 
         // Save the updated user
         userRepo.save(user);
+
+        Optional<Role> optionalRole=rolesRepo.findByRoleName(roleTypes);
+        if(optionalRole.isEmpty())
+        {
+            Role role=new Role();
+            role.setRoleName(roleTypes);
+
+        }
 
         return true;
     }
